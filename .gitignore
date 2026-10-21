@@ -1,0 +1,54 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# env — never commit secrets
+.env
+.env.*
+!.env.example
+
+# testing
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# expo / mobile (Phase 1+)
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+ios/
+android/
+
+# supabase local
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# vercel
+.vercel/
+
+# misc
+.DS_Store
+*.log
+*.pem
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+.vercel
+.env*

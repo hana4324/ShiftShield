@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "supabase/tests"
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver

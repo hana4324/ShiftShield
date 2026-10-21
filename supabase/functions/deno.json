@@ -1,0 +1,22 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "stripe": "npm:stripe@18.5.0",
+    "zod": "npm:zod@3",
+    "postgres": "npm:postgres@3",
+    "@shared/": "../../packages/shared/src/"
+  },
+  "unstable": ["sloppy-imports"],
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["no-explicit-any"]
+    }
+  }
+}

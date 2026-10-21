@@ -1,0 +1,17 @@
+{
+  "name": "@shiftshield/db-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Runs the Supabase migrations and RLS tests inside an embedded Postgres (PGlite). No Docker needed.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.6",
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

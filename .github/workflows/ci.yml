@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Shared package (typecheck, lint, unit tests)
+        run: |
+          pnpm --filter @shiftshield/shared typecheck
+          pnpm --filter @shiftshield/shared lint
+          pnpm --filter @shiftshield/shared test
+
+      - name: Database (migrations + RLS tests in embedded Postgres)
+        run: pnpm --filter @shiftshield/db-tests test
+
+      - name: Edge Functions (Deno type-check)
+        run: npx -y deno@2 check supabase/functions/_shared/*.ts supabase/functions/*/index.ts
+
+      - name: Web (typecheck, lint, build)
+        env:
+          NEXT_PUBLIC_SITE_URL: https://shiftshield-phi.vercel.app
+        run: |
+          pnpm --filter @shiftshield/web typecheck
+          pnpm --filter @shiftshield/web lint
+          pnpm --filter @shiftshield/web build
+
+      - name: Web (Playwright)
+        run: |
+          pnpm --filter @shiftshield/web exec playwright install --with-deps chromium
+          pnpm --filter @shiftshield/web exec playwright test
+
+      - name: Mobile (typecheck, lint, Metro export)
+        working-directory: apps/mobile
+        run: |
+          npx tsc --noEmit
+          npx expo lint
+          npx expo export --platform ios --platform android --output-dir .expo/export-check
