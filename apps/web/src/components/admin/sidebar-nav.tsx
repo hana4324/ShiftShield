@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
 export interface NavItem {
   href: string;
@@ -10,15 +11,33 @@ export interface NavItem {
   count?: number | null;
 }
 
+/**
+ * The URL read is isolated behind Suspense so the nav can be prerendered (including when the
+ * layout uses it as a fallback) without blocking on `usePathname()`.
+ */
 export function SidebarNav({ items }: { items: NavItem[] }) {
+  return (
+    <Suspense fallback={<NavList items={items} pathname={null} />}>
+      <ActiveNav items={items} />
+    </Suspense>
+  );
+}
+
+function ActiveNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
+  return <NavList items={items} pathname={pathname} />;
+}
+
+function NavList({ items, pathname }: { items: NavItem[]; pathname: string | null }) {
   return (
     <nav
       aria-label="Admin"
       className="-mx-1 flex items-center gap-1 overflow-x-auto px-1 lg:mt-8 lg:flex-col lg:items-stretch lg:overflow-visible"
     >
       {items.map((n) => {
-        const active = n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href);
+        const active =
+          pathname !== null &&
+          (n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href));
         return (
           <Link
             key={n.href}
