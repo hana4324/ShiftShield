@@ -264,8 +264,20 @@ export function Table({
   );
 }
 
-export function Td({ children, className = "" }: { children?: ReactNode; className?: string }) {
-  return <td className={`px-4 py-3 align-top ${className}`}>{children}</td>;
+export function Td({
+  children,
+  className = "",
+  title,
+}: {
+  children?: ReactNode;
+  className?: string;
+  title?: string;
+}) {
+  return (
+    <td className={`px-4 py-3 align-top ${className}`} title={title}>
+      {children}
+    </td>
+  );
 }
 
 export const inputClasses =
