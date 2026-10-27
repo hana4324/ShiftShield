@@ -32,6 +32,8 @@ export async function createSupabaseServerClient(
   if (!isSupabaseAuthConfigured()) return null;
   const store = await cookies();
   return createServerClient<Database>(serverEnv.supabaseUrl!, serverEnv.supabaseAnonKey!, {
+    // The generated types are keyed "public"; the runtime schema name may differ (shared project).
+    db: { schema: serverEnv.supabaseSchema as "public" },
     cookieOptions: {
       name: SUPABASE_AUTH_COOKIE,
       path: "/",

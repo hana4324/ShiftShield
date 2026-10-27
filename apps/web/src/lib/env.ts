@@ -14,6 +14,12 @@ export const serverEnv = {
   supabaseUrl: optional("NEXT_PUBLIC_SUPABASE_URL"),
   supabaseAnonKey: optional("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
   supabaseServiceRoleKey: optional("SUPABASE_SERVICE_ROLE_KEY"),
+  /**
+   * Postgres schema the ShiftShield tables live in. "public" for a dedicated project; set
+   * NEXT_PUBLIC_SUPABASE_SCHEMA when ShiftShield shares a project with another app (the schema
+   * must also be listed under API > Exposed schemas in the Supabase dashboard).
+   */
+  supabaseSchema: optional("NEXT_PUBLIC_SUPABASE_SCHEMA") ?? "public",
   googleMapsWebKey: optional("NEXT_PUBLIC_GOOGLE_MAPS_WEB_KEY"),
   adminPassword: optional("ADMIN_PASSWORD"),
   adminSessionSecret: optional("ADMIN_SESSION_SECRET"),

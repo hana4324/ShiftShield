@@ -13,6 +13,7 @@ export function getSupabaseAdmin(): SupabaseClient | null {
   if (!isSupabaseConfigured()) return null;
   if (cached) return cached;
   cached = createClient(serverEnv.supabaseUrl!, serverEnv.supabaseServiceRoleKey!, {
+    db: { schema: serverEnv.supabaseSchema as "public" },
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { headers: { "x-application-name": "shiftshield-web" } },
   });

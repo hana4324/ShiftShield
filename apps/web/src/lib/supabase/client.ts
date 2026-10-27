@@ -17,6 +17,8 @@ export function createSupabaseBrowserClient(): SupabaseClient<Database> | null {
   if (!url || !anonKey) return null;
   if (cached) return cached;
   cached = createBrowserClient<Database>(url, anonKey, {
+    // Same schema switch as the server clients (see lib/env.ts supabaseSchema).
+    db: { schema: (process.env.NEXT_PUBLIC_SUPABASE_SCHEMA || "public") as "public" },
     cookieOptions: { name: "ss-auth", path: "/", sameSite: "lax" },
   });
   return cached;
