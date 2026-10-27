@@ -61,7 +61,7 @@ async function WhoAmI() {
   const s = state.session;
   return (
     <p className="hidden truncate text-xs text-steel-400 lg:block" title={s.kind === "supabase" ? (s.email ?? "") : ""}>
-      {s.kind === "supabase" ? (s.email ?? "Admin") : "Local demo mode"}
+      {s.kind === "supabase" ? (s.email ?? "Open demo access") : "Local demo mode"}
     </p>
   );
 }

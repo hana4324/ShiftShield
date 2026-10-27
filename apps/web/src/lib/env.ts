@@ -17,6 +17,10 @@ export const serverEnv = {
   googleMapsWebKey: optional("NEXT_PUBLIC_GOOGLE_MAPS_WEB_KEY"),
   adminPassword: optional("ADMIN_PASSWORD"),
   adminSessionSecret: optional("ADMIN_SESSION_SECRET"),
+  /** ADMIN_OPEN_ACCESS=1 opens /admin to anyone, with no sign-in (demo / pilot only). */
+  adminOpenAccess: ["1", "true", "yes", "on"].includes(
+    (optional("ADMIN_OPEN_ACCESS") ?? "").toLowerCase(),
+  ),
   ipHashSalt: optional("IP_HASH_SALT") ?? "shiftshield-dev-salt",
   resendApiKey: optional("RESEND_API_KEY"),
   resendFromEmail: optional("RESEND_FROM_EMAIL") ?? "ShiftShield <onboarding@resend.dev>",
@@ -46,5 +50,6 @@ export function adminAuthMode(): AdminAuthMode {
 }
 
 export function isAdminConfigured(): boolean {
+  if (serverEnv.adminOpenAccess) return true;
   return adminAuthMode() === "supabase" ? isSupabaseAuthConfigured() : Boolean(serverEnv.adminPassword);
 }

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { adminAuthMode, serverEnv } from "./env";
+import { getSupabaseAdmin } from "./supabase-admin";
 import { decodeJwtPayload, isExpiring, readStoredSession } from "./supabase/middleware-free";
 import { createSupabaseServerClient, type CookieMode, type DbClient } from "./supabase/server";
 
@@ -15,6 +16,9 @@ import { createSupabaseServerClient, type CookieMode, type DbClient } from "./su
  *    the admin's own session client so RLS and `private.audit()` record who did what.
  *  - Otherwise (local demo without a backend): the Phase 0 shared ADMIN_PASSWORD cookie gate.
  *    No database is available in that mode, so pages show a "not configured" panel.
+ *  - ADMIN_OPEN_ACCESS=1 (demo / pilot only): every visitor is treated as an admin with no
+ *    sign-in at all. Data access uses the service-role client, so `private.is_admin()` must
+ *    accept `service_role` (migration 20261027000000) and the audit log records no actor.
  */
 
 export type AdminSession =
@@ -148,6 +152,23 @@ async function supabaseSessionState(mode: CookieMode): Promise<AdminSessionState
   };
 }
 
+/** ADMIN_OPEN_ACCESS: no cookie, no login; the service-role client stands in for an admin. */
+function openAccessSessionState(): AdminSessionState {
+  const db = getSupabaseAdmin() as DbClient | null;
+  if (!db) return { status: "ok", session: { kind: "password", db: null } };
+  return {
+    status: "ok",
+    session: {
+      kind: "supabase",
+      userId: "open-access",
+      email: null,
+      accessToken: "",
+      expiresAt: null,
+      db,
+    },
+  };
+}
+
 async function passwordSessionState(): Promise<AdminSessionState> {
   const store = await cookies();
   return verifySessionToken(store.get(ADMIN_COOKIE)?.value)
@@ -160,8 +181,10 @@ async function passwordSessionState(): Promise<AdminSessionState> {
  * `<Suspense>` boundary, a Server Action or a Route Handler. Memoized per request.
  */
 export const getAdminSession = cache(
-  async (mode: CookieMode = "readonly"): Promise<AdminSessionState> =>
-    adminAuthMode() === "supabase" ? supabaseSessionState(mode) : passwordSessionState(),
+  async (mode: CookieMode = "readonly"): Promise<AdminSessionState> => {
+    if (serverEnv.adminOpenAccess) return openAccessSessionState();
+    return adminAuthMode() === "supabase" ? supabaseSessionState(mode) : passwordSessionState();
+  },
 );
 
 export async function isAdminSession(): Promise<boolean> {
